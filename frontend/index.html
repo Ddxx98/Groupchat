@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GroupChat - Sign Up</title>
+    <link rel="stylesheet" href="./css/index.css">
+</head>
+
+<body>
+    <div class="signup-container">
+        <div class="form-card">
+            <h1>GroupChat</h1>
+            <h2>Sign Up</h2>
+            <form id="signupForm">
+                <div class="input-group">
+                    <input type="text" id="name" name="name" placeholder="Full Name" required />
+                    <span class="error-message" id="nameError"></span>
+                </div>
+                <div class="input-group">
+                    <input type="email" id="email" name="email" placeholder="Email Address" required />
+                    <span class="error-message" id="emailError"></span>
+                </div>
+                <div class="input-group">
+                    <input type="text" id="phone" name="phone" placeholder="Phone Number" required />
+                    <span class="error-message" id="phoneError"></span>
+                </div>
+                <div class="input-group">
+                    <input type="password" id="password" name="password" placeholder="Password" required />
+                    <span class="error-message" id="passwordError"></span>
+                </div>
+                <div class="input-group">
+                    <input type="password" id="confirmPassword" name="confirmPassword" placeholder="Confirm Password"
+                        required />
+                    <span class="error-message" id="confirmPasswordError"></span>
+                </div>
+                <button type="submit">Create Account</button>
+            </form>
+            <p>Already have an account? <a href="/login.html">Login</a></p>
+        </div>
+    </div>
+    <script src="./js/index.js"></script>
+</body>
+
+</html>
