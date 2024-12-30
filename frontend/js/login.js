@@ -28,15 +28,15 @@ document.getElementById("loginForm").addEventListener("submit", async function (
             });
             console.log(response);
             document.getElementById("loginForm").reset();
-            window.location.href = "/home.html";
+            //window.location.href = "/home.html";
         } catch (err) {
             console.log(err);
             if (err.response.status === 401) {
-                if (err.response.data.message === "Invalid email") {
-                    document.getElementById("emailError").textContent = "Email does not exist.";
-                } else if (err.response.data.message === "Invalid password") {
-                    document.getElementById("passwordError").textContent = "Invalid password.";
-                }
+                document.getElementById("passwordError").textContent = "Invalid password.";
+            } else if (err.response.status === 404) {
+                document.getElementById("emailError").textContent = "User not found.";
+            } else {
+                console.log(err);
             }
         }
     }
