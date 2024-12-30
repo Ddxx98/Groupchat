@@ -1,16 +1,16 @@
-document.getElementById("signupForm").addEventListener("submit", function (e) {
-    e.preventDefault(); 
+document.getElementById("signupForm").addEventListener("submit", async function (e) {
+    e.preventDefault();
 
     const errorMessages = document.querySelectorAll(".error-message");
     errorMessages.forEach((msg) => (msg.textContent = ""));
-
-    let isValid = true;
 
     const name = document.getElementById("name").value.trim();
     const email = document.getElementById("email").value.trim();
     const phone = document.getElementById("phone").value.trim();
     const password = document.getElementById("password").value;
     const confirmPassword = document.getElementById("confirmPassword").value;
+
+    let isValid = true;
 
     if (name === "") {
         document.getElementById("nameError").textContent = "Name is required.";
@@ -30,19 +30,37 @@ document.getElementById("signupForm").addEventListener("submit", function (e) {
     }
 
     if (password.length < 6) {
-        document.getElementById("passwordError").textContent =
-            "Password must be at least 6 characters long.";
+        document.getElementById("passwordError").textContent = "Password must be at least 6 characters long.";
         isValid = false;
     }
 
     if (password !== confirmPassword) {
-        document.getElementById("confirmPasswordError").textContent =
-            "Passwords do not match.";
+        document.getElementById("confirmPasswordError").textContent = "Passwords do not match.";
         isValid = false;
     }
 
     if (isValid) {
-        alert("Account created successfully!");
-        document.getElementById("signupForm").reset();
+        try {
+            const userId = await axios.post("http://localhost:3000/signup", {
+                name: name,
+                phone: phone,
+                email: email,
+                password: password
+            });
+            console.log(userId);
+            document.getElementById("signupForm").reset();
+            window.location.href = "/login.html";
+        } catch (err) {
+            console.log(err);
+            if (err.response.status === 409) {
+                if (err.response.data.message === "Email already exists") {
+                    document.getElementById("emailError").textContent = "Email already exists.";
+                } else if (err.response.data.message === "Phone number already exists") {
+                    document.getElementById("phoneError").textContent = "Phone number already exists.";
+                }
+            } else {
+                document.getElementById("serverError").textContent = "Internal Server Error.";
+            }
+        }
     }
 });
