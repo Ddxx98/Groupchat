@@ -27,6 +27,7 @@ document.getElementById("loginForm").addEventListener("submit", async function (
                 password: password
             });
             console.log(response);
+            window.localStorage.setItem("token", response.data.token);
             document.getElementById("loginForm").reset();
             window.location.href = "./chat.html";
         } catch (err) {

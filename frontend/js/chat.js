@@ -3,49 +3,68 @@ document.addEventListener("DOMContentLoaded", () => {
     const messageForm = document.getElementById("messageForm");
     const messageInput = document.getElementById("messageInput");
 
-    const userJoinMessage = (userName) => {
-        const joinMessage = document.createElement("p");
-        joinMessage.textContent = `${userName} has joined the chat.`;
-        joinMessage.classList.add("joined");
-        chatMessages.appendChild(joinMessage);
-        scrollToBottom();
+    const token = window.localStorage.getItem("token");
+    const loadMessages = async () => {
+        try {
+            const msg = await axios.get("http://localhost:3000/chats", {
+                headers: {
+                    Authorization: `${token}`
+                }
+            });
+            console.log(msg);
+            msg.data.chats.forEach(chat => {
+                displayMessage(chat.sender, chat.message);
+            });
+        } catch (err) {
+            console.log(err);
+        }
     };
 
-    const scrollToBottom = () => {
-        chatMessages.scrollTop = chatMessages.scrollHeight;
+    const displayMessage = (sender, message) => {
+        const messageContainer = document.createElement("div");
+        messageContainer.classList.add("chat-message");
+
+        const senderElement = document.createElement("div");
+        senderElement.classList.add("sender");
+        senderElement.textContent = sender;
+
+        const messageElement = document.createElement("div");
+        messageElement.classList.add("message-text");
+        messageElement.textContent = message;
+
+        messageContainer.appendChild(senderElement);
+        messageContainer.appendChild(messageElement);
+        chatMessages.appendChild(messageContainer);
+
+        chatMessages.scrollTop = chatMessages.scrollHeight; 
     };
 
-    setTimeout(() => {
-        userJoinMessage("John Doe");  
-    }, 2000);
+    const sendMessage = async (sender, message) => {
+        try {
+            const response = await axios.post("http://localhost:3000/chats", {
+                sender: sender,
+                message: message
+            }, {
+                headers: {
+                    Authorization: `${token}`
+                }
+            });
+            console.log(response);
+            displayMessage(sender, message);
+        } catch (err) {
+            console.log(err);
+        }
+    };
+
+    loadMessages();
 
     messageForm.addEventListener("submit", (e) => {
         e.preventDefault();
 
         const message = messageInput.value.trim();
         if (message) {
-            const userName = "You"; 
-
-            const messageContainer = document.createElement("div");
-            messageContainer.classList.add("chat-message");
-
-            const senderElement = document.createElement("div");
-            senderElement.classList.add("sender");
-            senderElement.textContent = userName;
-
-            const messageElement = document.createElement("div");
-            messageElement.classList.add("message-text");
-            messageElement.textContent = message;
-            if (userName === "You") { 
-                messageElement.classList.add("self");
-            }
-
-            messageContainer.appendChild(senderElement);
-            messageContainer.appendChild(messageElement);
-            chatMessages.appendChild(messageContainer);
-
+            sendMessage("You", message);
             messageInput.value = "";
-            scrollToBottom();
         }
     });
 });  

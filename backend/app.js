@@ -5,8 +5,10 @@ const cors = require('cors')
 const sequelize = require('./util/database')
 const signupRoutes = require('./routes/signup')
 const loginRoutes = require('./routes/login')
+const chatRoutes = require('./routes/chats')
 
-const User = require('./models/user');
+const User = require('./models/user')
+const Chats = require('./models/chats')
 
 const app = express();
 
@@ -22,6 +24,10 @@ app.use(bodyParser.urlencoded({ extended: true }));
 
 app.use('/signup', signupRoutes)
 app.use('/login', loginRoutes)
+app.use('/chats', chatRoutes)
+
+User.hasMany(Chats);
+Chats.belongsTo(User);
 
 sequelize.sync()
     .then(result => {
