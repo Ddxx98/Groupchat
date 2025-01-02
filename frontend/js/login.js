@@ -28,7 +28,7 @@ document.getElementById("loginForm").addEventListener("submit", async function (
             });
             console.log(response);
             document.getElementById("loginForm").reset();
-            //window.location.href = "/home.html";
+            window.location.href = "./chat.html";
         } catch (err) {
             console.log(err);
             if (err.response.status === 401) {

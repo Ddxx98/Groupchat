@@ -1,7 +1,7 @@
 body {
     font-family: 'Arial', sans-serif;
     margin: 0;
-    background: linear-gradient(to right, #6a11cb, #2575fc);
+    background: linear-gradient(135deg, #4caf50, #81c784);
     display: flex;
     justify-content: center;
     align-items: center;
@@ -23,7 +23,7 @@ body {
 }
 
 h1 {
-    color: #6a11cb;
+    color: #4caf50;
     font-size: 30px;
     margin-bottom: 10px;
 }
@@ -49,7 +49,7 @@ form input {
 form button {
     width: 100%;
     padding: 15px;
-    background: #6a11cb;
+    background: #4caf50;
     color: #fff;
     border: none;
     border-radius: 8px;
@@ -60,7 +60,7 @@ form button {
 }
 
 form button:hover {
-    background: #4b0fdc;
+    background: #388e3c;
 }
 
 p {
@@ -69,7 +69,7 @@ p {
 }
 
 a {
-    color: #6a11cb;
+    color: #4caf50;
     text-decoration: none;
     font-weight: bold;
 }
