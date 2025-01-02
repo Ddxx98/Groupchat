@@ -4,19 +4,29 @@ document.addEventListener("DOMContentLoaded", () => {
     const messageInput = document.getElementById("messageInput");
 
     const token = window.localStorage.getItem("token");
+    const loadedMessages = new Set();
+
     const loadMessages = async () => {
         try {
-            const msg = await axios.get("http://localhost:3000/chats", {
-                headers: {
-                    Authorization: `${token}`
+            const response = await axios.get("http://localhost:3000/chats", {
+                headers: { Authorization: `${token}` },
+            });
+
+            let isNewMessageAdded = false;
+
+            response.data.chats.forEach((chat) => {
+                if (!loadedMessages.has(chat.id)) {
+                    displayMessage(chat.sender, chat.message);
+                    loadedMessages.add(chat.id);
+                    isNewMessageAdded = true;
                 }
             });
-            console.log(msg);
-            msg.data.chats.forEach(chat => {
-                displayMessage(chat.sender, chat.message);
-            });
+
+            if (isNewMessageAdded) {
+                scrollToLatestMessage();
+            }
         } catch (err) {
-            console.log(err);
+            console.error(err);
         }
     };
 
@@ -34,29 +44,40 @@ document.addEventListener("DOMContentLoaded", () => {
 
         messageContainer.appendChild(senderElement);
         messageContainer.appendChild(messageElement);
-        chatMessages.appendChild(messageContainer);
 
-        chatMessages.scrollTop = chatMessages.scrollHeight; 
+        if (sender === "You") {
+            messageContainer.classList.add("you");
+        } else {
+            messageContainer.classList.add("other");
+        }
+
+        chatMessages.appendChild(messageContainer);
     };
 
     const sendMessage = async (sender, message) => {
         try {
-            const response = await axios.post("http://localhost:3000/chats", {
-                sender: sender,
-                message: message
-            }, {
-                headers: {
-                    Authorization: `${token}`
-                }
-            });
-            console.log(response);
-            displayMessage(sender, message);
+            const response = await axios.post(
+                "http://localhost:3000/chats",
+                { sender: sender, message: message },
+                { headers: { Authorization: `${token}` } }
+            );
+
+            if (response.data && response.data.chat) {
+                displayMessage(response.data.chat.sender, response.data.chat.message);
+                loadedMessages.add(response.data.chat.id);
+                scrollToLatestMessage();
+            }
         } catch (err) {
-            console.log(err);
+            console.error(err);
         }
     };
 
-    loadMessages();
+    const scrollToLatestMessage = () => {
+        chatMessages.scrollTo({
+            top: chatMessages.scrollHeight,
+            behavior: "smooth",
+        });
+    };
 
     messageForm.addEventListener("submit", (e) => {
         e.preventDefault();
@@ -67,4 +88,6 @@ document.addEventListener("DOMContentLoaded", () => {
             messageInput.value = "";
         }
     });
-});  
+
+    setInterval(loadMessages, 1000);
+});

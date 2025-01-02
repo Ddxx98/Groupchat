@@ -1,119 +1,150 @@
-body {
-    font-family: 'Arial', sans-serif;
+* {
     margin: 0;
     padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: Arial, sans-serif;
     background: linear-gradient(135deg, #4caf50, #81c784);
-    height: 100vh;
+    color: #333;
     display: flex;
     justify-content: center;
     align-items: center;
-}
-
-.chat-container {
-    display: flex;
-    flex-direction: column;
-    background: #ffffff;
-    width: 90%;
-    max-width: 1200px;
-    height: 90%;
-    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
-    border-radius: 10px;
+    height: 100vh;
+    margin: 0;
     overflow: hidden;
 }
 
-/* Header */
+.chat-container {
+    width: 90%;
+    max-width: 600px;
+    height: 95%;
+    display: flex;
+    flex-direction: column;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    overflow: hidden;
+    background-color: #ffffff;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
 .chat-header {
-    background: #4caf50;
+    background-color: #4caf50;
     color: white;
-    padding: 15px;
+    padding: 10px;
     text-align: center;
 }
 
-/* Chat Main */
+.chat-header h1 {
+    font-size: 1.5rem;
+}
+
 .chat-main {
-    display: flex;
     flex: 1;
+    overflow-y: auto;
+    padding: 10px;
+    display: flex;
     flex-direction: column;
+    gap: 10px;
 }
 
 .chat-messages {
-    flex: 1;
-    padding: 20px;
-    overflow-y: auto;
-    background: #f7f7f7;
-}
-
-/* Styling for "user joined" bubble (transparent) */
-.chat-messages p.joined {
-    color: #ffffff;
-    background-color: rgba(76, 175, 80, 0.5);
-    /* Semi-transparent green */
-    padding: 12px;
-    border-radius: 20px;
-    margin: 10px 0;
-    text-align: center;
-    font-style: normal;
-    font-weight: bold;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    font-size: 14px;
-}
-
-/* Styling for messages */
-.chat-message {
-    margin: 15px 0;
     display: flex;
     flex-direction: column;
+    gap: 10px;
+    overflow-y: auto;
+    max-height: 100%;
+}
+
+.chat-message {
+    max-width: 75%;
+    padding: 10px;
+    border-radius: 15px;
+    font-size: 0.9rem;
+    word-wrap: break-word;
 }
 
 .chat-message .sender {
     font-weight: bold;
-    color: #4caf50;
     margin-bottom: 5px;
-    font-size: 14px;
+    font-size: 0.8rem;
 }
 
-.chat-message .message-text {
-    padding: 12px;
-    background: #e0e0e0;
+.chat-message.you {
+    background-color: #dcf8c6;
+    align-self: flex-end;
+    color: #333;
+}
+
+.chat-message.other {
+    background-color: #e5e5ea;
+    align-self: flex-start;
+    color: #333;
+}
+
+.chat-message.joined {
+    align-self: center;
+    background-color: rgba(72, 133, 237, 0.1);
+    color: #4885ed;
+    font-style: italic;
+    font-size: 0.8rem;
+    border: 1px solid rgba(72, 133, 237, 0.2);
+    padding: 5px 10px;
     border-radius: 10px;
-    max-width: 70%;
-    font-size: 16px;
 }
 
-.chat-message .message-text.self {
-    background: #4caf50;
-    color: white;
-    margin-left: auto;
-}
-
-.chat-form {
-    display: flex;
+.chat-footer {
     padding: 10px;
-    border-top: 1px solid #ddd;
+    background-color: #f4f4f9;
+    border-top: 1px solid #ccc;
+    display: flex;
 }
 
-.chat-form input {
+.chat-footer form {
+    display: flex;
+    flex: 1;
+    gap: 10px;
+}
+
+.chat-footer input[type="text"] {
     flex: 1;
     padding: 10px;
-    border: 1px solid #ddd;
-    border-radius: 5px 0 0 5px;
+    border: 1px solid #ccc;
+    border-radius: 20px;
+    outline: none;
+    font-size: 1rem;
 }
 
-.chat-form button {
-    padding: 10px 20px;
-    background: #4caf50;
+.chat-footer button {
+    background-color: #4caf50;
     color: white;
     border: none;
-    border-radius: 0 5px 5px 0;
+    padding: 10px 15px;
+    border-radius: 20px;
+    font-size: 1rem;
     cursor: pointer;
 }
 
-.chat-form button:hover {
-    background: #388e3c;
+.chat-footer button:hover {
+    background-color: #45a049;
 }
 
-@media screen and (max-width: 768px) {
+@media (max-width: 768px) {
     .chat-container {
-        flex-direction: column;
+        width: 100%;
+        height: 100%;
+    }
+
+    .chat-header h1 {
+        font-size: 1.2rem;
+    }
+
+    .chat-footer input[type="text"] {
+        font-size: 0.9rem;
+    }
+
+    .chat-footer button {
+        font-size: 0.9rem;
     }
 }

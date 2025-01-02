@@ -2,7 +2,7 @@ const Chats = require('../models/chats')
 
 exports.addChats = async (req, res, next) => {
     const message = req.body.message
-    const sender = req.body.sender
+    const sender = req.user.name
     const receiver = req.body.receiver
     const userId = req.user.id
     try{

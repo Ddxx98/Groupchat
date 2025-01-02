@@ -4,24 +4,25 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Group Chat</title>
+    <title>GroupChat</title>
     <link rel="stylesheet" href="./css/chat.css">
 </head>
 
 <body>
     <div class="chat-container">
-        <div class="chat-header">
-            <h1>Group Chat</h1>
-        </div>
-        <div class="chat-main">
+        <header class="chat-header">
+            <h1>GroupChat</h1>
+        </header>
+        <main class="chat-main">
             <div id="chatMessages" class="chat-messages"></div>
-            <form id="messageForm" class="chat-form">
-                <input type="text" id="messageInput" placeholder="Type a message..." />
+        </main>
+        <footer class="chat-footer">
+            <form id="messageForm">
+                <input id="messageInput" type="text" placeholder="Type your message..." autocomplete="off" required />
                 <button type="submit">Send</button>
             </form>
-        </div>
+        </footer>
     </div>
-
     <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/1.7.8/axios.min.js" referrerpolicy="no-referrer"></script>
     <script src="./js/chat.js"></script>
 </body>
