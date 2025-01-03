@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GroupChat - Groups</title>
+    <link rel="stylesheet" href="./css/group.css">
+</head>
+
+<body>
+    <div class="group-container">
+        <header class="group-header">
+            <h1>GroupChat</h1>
+        </header>
+        <main class="group-main">
+            <div id="groupList" class="group-list">
+                
+            </div>
+            <button id="createGroupBtn" class="create-group-btn">+ Create New Group</button>
+        </main>
+        <footer class="group-footer hidden" id="createGroupSection">
+            <form id="createGroupForm">
+                <input id="groupNameInput" type="text" placeholder="Enter group name..." required>
+                <div class="form-buttons">
+                    <button type="submit" class="submit-btn">Create</button>
+                    <button type="button" id="cancelGroupBtn" class="cancel-btn">Cancel</button>
+                </div>
+            </form>
+        </footer>
+    </div>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/1.7.8/axios.min.js" referrerpolicy="no-referrer"></script>
+    <script src="./js/group.js"></script>
+</body>
+
+</html>

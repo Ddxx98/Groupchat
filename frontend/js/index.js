@@ -49,7 +49,7 @@ document.getElementById("signupForm").addEventListener("submit", async function 
             });
             console.log(userId);
             document.getElementById("signupForm").reset();
-            window.location.href = "/login.html";
+            window.location.href = "./login.html";
         } catch (err) {
             console.log(err);
             if (err.response.status === 409) {

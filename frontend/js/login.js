@@ -29,7 +29,7 @@ document.getElementById("loginForm").addEventListener("submit", async function (
             console.log(response);
             window.localStorage.setItem("token", response.data.token);
             document.getElementById("loginForm").reset();
-            window.location.href = "./chat.html";
+            window.location.href = "./group.html";
         } catch (err) {
             console.log(err);
             if (err.response.status === 401) {
