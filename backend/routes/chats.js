@@ -13,4 +13,6 @@ router.get('/', checkAuth.userAuthenticate, chatsController.getLastChat);
 
 router.get('/getGroupChat', checkAuth.userAuthenticate, chatsController.getGroupChat);
 
+router.get('/users', checkAuth.userAuthenticate, chatsController.getAllUsers);
+
 module.exports = router;

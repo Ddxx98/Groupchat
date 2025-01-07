@@ -123,3 +123,8 @@ body {
 .cancel-btn:hover {
     background-color: #d32f2f;
 }
+
+.group-item span {
+    font-weight: bold;
+    width: 100%;
+}

@@ -4,8 +4,132 @@ document.addEventListener("DOMContentLoaded", () => {
     const messageInput = document.getElementById("messageInput");
     const groupId = new URLSearchParams(window.location.search).get("groupId");
 
+    const showUsersBtn = document.getElementById("showUsersBtn");
+    const usersModal = document.getElementById("usersModal");
+    const closeModal = document.getElementById("closeModal");
+    const usersList = document.getElementById("usersList");
+
     const token = window.localStorage.getItem("token");
+    const admin = window.localStorage.getItem("Admin");
     const loadedMessages = new Set();
+
+    if (admin === "false") {
+        showUsersBtn.style.display = "none";
+    }
+
+    if (showUsersBtn) {
+        showUsersBtn.addEventListener("click", async () => {
+            usersModal.style.display = "flex";
+            try {
+                const response = await axios.get(`http://localhost:3000/chats/users`, {
+                    headers: { Authorization: `${token}` },
+                });
+                const users = response.data.users;
+                console.log(users);
+                usersList.innerHTML = "";
+
+                users.forEach(user => {
+                    const listItem = document.createElement("li");
+                    listItem.textContent = user.name;
+                    usersList.appendChild(listItem);
+
+                    const deleteButton = document.createElement("button");
+                    deleteButton.classList.add("delete-btn");
+                    deleteButton.textContent = "Delete";
+                    deleteButton.addEventListener("click", () => {
+                        deleteUser(user.id);
+                    });
+
+                    const joinButton = document.createElement("button");
+                    joinButton.classList.add("add-btn");
+                    joinButton.textContent = "Add";
+                    joinButton.addEventListener("click", () => {
+                        addGroup(user.id);
+                    });
+
+                    const promoteButton = document.createElement("button");
+                    promoteButton.classList.add("promote-btn");
+                    promoteButton.textContent = "Promote";
+                    promoteButton.addEventListener("click", () => {
+                        promoteUser(user.id);
+                    });
+
+                    listItem.appendChild(joinButton);
+                    listItem.appendChild(promoteButton);
+                    listItem.appendChild(deleteButton);
+                });
+            } catch (error) {
+                console.error("Failed to fetch users:", error);
+            }
+        });
+    }
+
+    const addGroup = async (userId) => {
+        console.log(userId);
+        try {
+            const response = await axios.post(
+                `http://localhost:3000/group/add`,
+                {
+                    userId: userId,
+                    groupId: groupId
+                },
+                { headers: { Authorization: `${token}` } }
+            );
+            window.location.href = `./chat.html?groupId=${groupId}`;
+        } catch (err) {
+            if (err.response.status === 409) {
+                return alert("User is already a member of this group.");
+            }
+            console.error("Error joining group:", err);
+            alert("Failed to add user to group.");
+        }
+    };
+
+    const deleteUser = async (userId) => {
+        console.log(userId);
+        try {
+            const response = await axios.delete(
+                `http://localhost:3000/group/delete?userId=${userId}&groupId=${groupId}`,
+                { headers: { Authorization:`${token}` } }
+            );
+            console.log(response.data);
+            window.location.href = `./chat.html?groupId=${groupId}`;
+        } catch (err) {
+            console.error("Error leaving group:", err);
+            alert("Failed to leave group.");
+        }
+    };
+
+    closeModal.addEventListener("click", () => {
+        usersModal.style.display = "none";
+    });
+
+    window.addEventListener("click", (event) => {
+        if (event.target === usersModal) {
+            usersModal.style.display = "none";
+        }
+    });
+
+    const promoteUser = async (userId) => {
+        console.log(userId);
+        try {
+            const response = await axios.post(
+                `http://localhost:3000/group/promote`,
+                {
+                    userId: userId,
+                    groupId: groupId
+                },
+                { headers: { Authorization: `${token}` } }
+            );
+            window.location.href = `./chat.html?groupId=${groupId}`;
+        } catch (err) {
+            if (err.response.status === 409) {
+                return alert(err.response.data.message);
+            }
+            console.error("Error promoting user:", err);
+            alert("Failed to promote user.");
+        }
+    };
 
     const loadMessages = async () => {
         try {
@@ -27,6 +151,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 scrollToLatestMessage();
             }
         } catch (err) {
+            window.location.href = "./login.html";
             console.error(err);
         }
     };
@@ -69,6 +194,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 scrollToLatestMessage();
             }
         } catch (err) {
+            window.location.href = "./group.html?groupId=${groupId}";
             console.error(err);
         }
     };

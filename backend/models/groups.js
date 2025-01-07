@@ -13,18 +13,4 @@ const Groups = sequelize.define('groups', {
     },
 });
 
-Groups.belongsToMany(User, {
-    through: 'GroupUser',
-    foreignKey: 'groupId',
-    otherKey: 'userId',
-    as: 'members',
-});
-
-User.belongsToMany(Groups, {
-    through: 'GroupUser',
-    foreignKey: 'userId',
-    otherKey: 'groupId',
-    as: 'groups',
-});
-
 module.exports = Groups;

@@ -1,6 +1,7 @@
 const express = require('express');
 const bodyParser = require('body-parser');
 const cors = require('cors')
+require('dotenv').config()
 
 const sequelize = require('./util/database')
 const signupRoutes = require('./routes/signup')
@@ -14,28 +15,33 @@ const Groups = require('./models/groups')
 
 const app = express();
 
+// const corsOptions = {
+//     origin: process.env.FRONTEND_URL,
+//     methods: ['GET', 'POST', 'PUT', 'DELETE'],
+//     allowedHeaders: ['Content-Type', 'Authorization'],
+// }
+
 app.use(cors())
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
-// app.get((req, res) => {
-//     const url = req.url;
-//     res.sendFile(path.join(__dirname, `${url}`));
-// });
+app.get("/",(req, res) => {
+   res.send("Hello World")
+});
 
 app.use('/signup', signupRoutes)
 app.use('/login', loginRoutes)
 app.use('/chats', chatRoutes)
 app.use('/group', groupRoutes)
 
-User.belongsToMany(Groups, { through: 'UserGroups' });
-Groups.belongsToMany(User, { through: 'UserGroups' });
+User.hasMany(Chats)
+Chats.belongsTo(User)
 
-Groups.hasMany(Chats, { foreignKey: 'groupId', as: 'groupChats' });
-Chats.belongsTo(Groups, { foreignKey: 'groupId', as: 'chatGroup' }); 
+Groups.hasMany(Chats)
+Chats.belongsTo(Groups)
 
-User.hasMany(Chats, { foreignKey: 'userId', as: 'userChats' });
-Chats.belongsTo(User, { foreignKey: 'userId', as: 'chatUser' });
+User.hasMany(Groups)
+Groups.belongsTo(User)
 
 sequelize.sync()
     .then(result => {

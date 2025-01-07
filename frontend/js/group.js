@@ -23,36 +23,39 @@ document.addEventListener("DOMContentLoaded", () => {
                 const groupName = document.createElement("span");
                 groupName.textContent = group.groupName;
 
-                const joinButton = document.createElement("button");
-                joinButton.classList.add("join-btn");
-                joinButton.textContent = "Join";
-                joinButton.addEventListener("click", () => {
-                    joinGroup(group.id);
+                groupName.addEventListener("click", () => {
+                    insideGroup(group.id);
                 });
 
                 groupItem.appendChild(groupName);
-                groupItem.appendChild(joinButton);
                 groupList.appendChild(groupItem);
             });
         } catch (err) {
+            window.location.href = "./login.html";
             console.error("Error fetching groups:", err);
         }
     };
 
-    const joinGroup = async (groupId) => {
-        try {
+    const insideGroup = async (groupId) => {
+        try{
             const response = await axios.post(
-                `http://localhost:3000/group/join`,
+                `http://localhost:3000/group/insideGroup`,
                 {groupId: groupId},
                 { headers: { Authorization: `${token}` } }
             );
+            console.log(response);
+            window.localStorage.setItem("Admin", response.data.isAdmin);
+            if(response.data.status === 409){
+                return alert("User is not a member of the group.");
+            }
             window.location.href = `./chat.html?groupId=${groupId}`;
-            loadGroups(); 
         } catch (err) {
+            if(err.response.status === 409){
+                return alert("User is not a member of the group.");
+            }
             console.error("Error joining group:", err);
-            alert("Failed to join group.");
         }
-    };
+    }
 
     createGroupBtn.addEventListener("click", () => {
         createGroupSection.classList.remove("hidden");

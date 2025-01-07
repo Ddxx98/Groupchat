@@ -10,6 +10,10 @@ const GroupUser = sequelize.define('groupUser', {
         type: Sequelize.INTEGER,
         allowNull: false,
     },
+    isAdmin: {
+        type: Sequelize.BOOLEAN,
+        allowNull: false,
+    }
 });
 
 module.exports = GroupUser;

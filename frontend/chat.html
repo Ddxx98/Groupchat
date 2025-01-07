@@ -12,6 +12,7 @@
     <div class="chat-container">
         <header class="chat-header">
             <h1>GroupChat</h1>
+            <button id="showUsersBtn" class="show-users-btn">Show All Users</button>
         </header>
         <main class="chat-main">
             <div id="chatMessages" class="chat-messages"></div>
@@ -22,6 +23,13 @@
                 <button type="submit">Send</button>
             </form>
         </footer>
+    </div>
+    <div id="usersModal" class="modal" style="display: none;">
+        <div class="modal-content">
+            <span id="closeModal" class="close">&times;</span>
+            <h2>All Users</h2>
+            <ul id="usersList"></ul>
+        </div>
     </div>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/1.7.8/axios.min.js" referrerpolicy="no-referrer"></script>
     <script src="./js/chat.js"></script>
