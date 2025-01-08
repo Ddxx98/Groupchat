@@ -8,22 +8,51 @@ document.addEventListener("DOMContentLoaded", () => {
     const usersModal = document.getElementById("usersModal");
     const closeModal = document.getElementById("closeModal");
     const usersList = document.getElementById("usersList");
+    const fileInput = document.getElementById("fileInput");
+    const fileBtn = document.getElementById("attachSymbol");
 
     const token = window.localStorage.getItem("token");
     const admin = window.localStorage.getItem("Admin");
     const loadedMessages = new Set();
 
-    const socket = io("http://localhost:3001",{
-        Authorization : `${token}`
+    const socket = io("http://localhost:3000",{
+        auth: {
+            token: token,
+        },
     });
 
-    const sendioMessage = (groupId, message) => {
-        socket.emit("message", {  message, groupId},(response) => {
-            if (response.status == 400 || response.status == 500) {
-                console.log(response.message);
+    socket.emit("joinGroup", groupId);
+
+    fileBtn.addEventListener("click", () => {
+        fileInput.click();
+    });
+
+    fileInput.addEventListener("change", async (event) => {
+        const file = event.target.files[0];
+        if (file) {
+            const formData = new FormData();
+            formData.append("file", file);
+            formData.append("groupId", groupId);
+
+            try {
+                const response = await axios.post("http://localhost:3000/chats/upload", formData, {
+                    headers: {
+                        Authorization: `${token}`,
+                        "Content-Type": "multipart/form-data",
+                    },
+                });
+
+                socket.emit("message", {
+                    groupId,
+                    type: "file",
+                    fileUrl: response.data.fileUrl,
+                    fileName: file.name,
+                });
+            } catch (error) {
+                console.error("Failed to upload file:", error);
             }
-        });
-    };
+        }
+    });
 
     if (admin === "false") {
         showUsersBtn.style.display = "none";
@@ -192,23 +221,23 @@ document.addEventListener("DOMContentLoaded", () => {
         chatMessages.appendChild(messageContainer);
     };
 
-    const sendMessage = async (sender, message) => {
-        try {
-            // const response = await axios.post(
-            //     "http://localhost:3000/chats",
-            //     { sender: sender, message: message, groupId: groupId },
-            //     { headers: { Authorization: `${token}` } }
-            // );
-            const response = sendioMessage(groupId, message);
-            console.log(response);
+    socket.on('message', ({ sender, message }) => {
+        displayMessage(sender, message);
+        scrollToLatestMessage();
+    });
 
-            if (response.data && response.data.chat) {
-                displayMessage(response.data.chat.sender, response.data.chat.message);
-                loadedMessages.add(response.data.chat.id);
-                scrollToLatestMessage();
-            }
+    const sendMessage = async ( message) => {
+        try {
+            socket.emit("message", {  message, groupId },(response) => {
+                console.log(response)
+                if(response.status == 200){
+                    displayMessage(response.message.sender, response.message.message);
+                    loadedMessages.add(response.message.id);
+                    scrollToLatestMessage();
+                }
+            })
         } catch (err) {
-            //window.location.href = "./group.html?groupId=${groupId}";
+            window.location.href = "./group.html?groupId=${groupId}";
             console.error(err);
         }
     };
@@ -225,132 +254,9 @@ document.addEventListener("DOMContentLoaded", () => {
 
         const message = messageInput.value.trim();
         if (message) {
-            sendMessage("You", message);
+            sendMessage( message);
             messageInput.value = "";
         }
     });
     loadMessages();
 });
-// document.addEventListener("DOMContentLoaded", () => {
-//     const chatMessages = document.getElementById("chatMessages");
-//     const messageForm = document.getElementById("messageForm");
-//     const messageInput = document.getElementById("messageInput");
-//     const token = window.localStorage.getItem("token");
-//     const messagesKey = "chatMessages";
-//     const maxMessages = 10;
-
-//     const loadMessages = async (lastMessageId = null) => {
-//         try {
-//             const msg = await axios.get(`http://localhost:3000/chats?lastMessageId=${lastMessageId}`, {
-//                 headers: {
-//                     Authorization: `${token}`
-//                 }
-//             });
-
-//             if (msg.data.chats) {
-//                 msg.data.chats.forEach(chat => {
-//                     displayMessage(chat.sender, chat.message, chat.id);
-//                 });
-
-//                 storeMessages(msg.data.chats);
-//                 scrollToLatestMessage();
-//             }
-//         } catch (err) {
-//             console.log(err);
-//         }
-//     };
-
-//     const displayMessage = (sender, message, messageId) => {
-//         const messageContainer = document.createElement("div");
-//         messageContainer.classList.add("chat-message");
-
-//         const senderElement = document.createElement("div");
-//         senderElement.classList.add("sender");
-//         senderElement.textContent = sender;
-
-//         const messageElement = document.createElement("div");
-//         messageElement.classList.add("message-text");
-//         messageElement.textContent = message;
-
-//         messageContainer.appendChild(senderElement);
-//         messageContainer.appendChild(messageElement);
-
-//         if (sender === "You") {
-//             messageContainer.classList.add("you");
-//         } else {
-//             messageContainer.classList.add("other");
-//         }
-
-//         chatMessages.appendChild(messageContainer);
-//     };
-
-//     const sendMessage = async (sender, message) => {
-//         try {
-//             const response = await axios.post("http://localhost:3000/chats", {
-//                 sender: sender,
-//                 message: message
-//             }, {
-//                 headers: {
-//                     Authorization: `${token}`
-//                 }
-//             });
-
-//             if (response.data.chat) {
-//                 displayMessage(sender, message, response.data.chat.id);
-//                 storeMessages([response.data.chat]);
-//             }
-//         } catch (err) {
-//             console.log(err);
-//         }
-//     };
-
-//     const storeMessages = (newMessages) => {
-//         let storedMessages = JSON.parse(localStorage.getItem(messagesKey)) || [];
-
-//         storedMessages.push(...newMessages);
-
-//         if (storedMessages.length > maxMessages) {
-//             storedMessages = storedMessages.slice(-maxMessages);
-//         }
-
-//         localStorage.setItem(messagesKey, JSON.stringify(storedMessages));
-//     };
-
-//     const loadStoredMessages = () => {
-//         const storedMessages = JSON.parse(localStorage.getItem(messagesKey)) || [];
-
-//         const messagesToShow = storedMessages.slice(-maxMessages);
-//         messagesToShow.forEach(chat => {
-//             displayMessage(chat.sender, chat.message, chat.id);
-//         });
-//     };
-
-//     const scrollToLatestMessage = () => {
-//         chatMessages.scrollTop = chatMessages.scrollHeight;
-//     };
-
-//     setInterval(() => {
-//         const lastMessageId = getLastMessageId();
-//         loadMessages(lastMessageId);
-//     }, 1000);
-
-//     const getLastMessageId = () => {
-//         const storedMessages = JSON.parse(localStorage.getItem(messagesKey)) || [];
-//         if (storedMessages.length > 0) {
-//             return storedMessages[storedMessages.length - 1].id;
-//         }
-//         return null;
-//     };
-
-//     messageForm.addEventListener("submit", (e) => {
-//         e.preventDefault();
-
-//         const message = messageInput.value.trim();
-//         if (message) {
-//             sendMessage("You", message);
-//             messageInput.value = "";
-//         }
-//     });
-
-//     loadStoredMessages();
-// });

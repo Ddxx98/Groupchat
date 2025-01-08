@@ -1,6 +1,7 @@
 const Chats = require('../models/chats')
 const User = require('../models/user')
 const groupUser = require('../models/groupUser')
+const S3services = require('../services/S3services')
 const { Op } = require('sequelize')
 
 exports.addChats = async (req, res, next) => {
@@ -71,5 +72,17 @@ exports.socketAddChat = async (message, sender, userId, groupId) => {
         return chat
     } catch(err) {
         return err
+    }
+}
+
+exports.uploadFile = async (req, res, next) => {
+    try{
+        const file = req.file
+        const fileName = `files/${req.body.groupId}/user/${req.user.id}/${file.originalname}`
+        const url = await S3services.uploadtoS3(file.buffer, fileName, process.env.AWS_BUCKET_NAME)
+        res.status(200).json({ message: "File uploaded", url: url })
+    } catch(err) {
+        console.log(err)
+        res.status(500).json({ message: "Internal Server Error" })
     }
 }

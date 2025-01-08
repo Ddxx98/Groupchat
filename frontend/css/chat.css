@@ -431,3 +431,29 @@ body {
     background-color: #fb8c00; 
     transform: scale(1.05);
 }
+
+.attach-symbol {
+    font-size: 20px;
+    font-weight: bold;
+    color: white;
+    cursor: pointer;
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
+    width: 50px;
+    height: 40px;
+    background-color: #4caf50;
+    border-radius: 50%;
+    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.2);
+    transition: all 0.3s ease-in-out;
+}
+
+.attach-symbol:hover {
+    background-color: #45a049;
+    transform: scale(1.1);
+    box-shadow: 0px 6px 8px rgba(0, 0, 0, 0.3);
+}
+
+.attach-symbol:active {
+    transform: scale(0.95);
+}

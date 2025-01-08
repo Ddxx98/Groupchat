@@ -2,6 +2,8 @@ const express = require('express');
 const bodyParser = require('body-parser');
 const cors = require('cors')
 const jwt = require('jsonwebtoken')
+const http = require('http')
+const { Server } = require('socket.io')
 require('dotenv').config()
 
 const sequelize = require('./util/database')
@@ -23,11 +25,13 @@ const corsOptions = {
     allowedHeaders: ['Content-Type', 'Authorization'],
 }
 
-app.use(cors())
+app.use(cors(corsOptions))
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
-const io = require('socket.io')(3001, {
+const server = http.createServer(app);
+
+const io = new Server(server, {
     cors: corsOptions
 });
 
@@ -47,13 +51,17 @@ io.use((socket, next) => {
 
 io.on('connection', (socket) => {
     console.log('a user connected');
+    socket.on('joinGroup', (groupId) => {
+        socket.join(groupId);
+        console.log(`${socket.user.name} joined group ${groupId}`);
+    });
     socket.on("message", async (data, cb) => {
         const chat = await chatsController.socketAddChat(data.message, socket.user.name, socket.user.id, data.groupId)
-        io.to(data.groupId).emit("message", {
+        socket.broadcast.to(data.groupId).emit("message", {
             sender: socket.user.name,
             message: data.message
         });
-        if(chat.name){
+        if(chat.dataValues.id){
             cb({status: 200, message: chat})
         }else{
             cb({status: 400, message: chat})
@@ -84,7 +92,7 @@ Groups.belongsTo(User)
 
 sequelize.sync()
     .then(result => {
-        app.listen(process.env.PORT || 3000, () => {
+        server.listen(process.env.PORT || 3000, () => {
             console.log("Server running in 3000")
         });
     })
