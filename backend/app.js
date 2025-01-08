@@ -56,10 +56,11 @@ io.on('connection', (socket) => {
         console.log(`${socket.user.name} joined group ${groupId}`);
     });
     socket.on("message", async (data, cb) => {
-        const chat = await chatsController.socketAddChat(data.message, socket.user.name, socket.user.id, data.groupId)
+        const chat = await chatsController.socketAddChat(data.message, socket.user.name, socket.user.id, data.groupId, data.type);
         socket.broadcast.to(data.groupId).emit("message", {
             sender: socket.user.name,
-            message: data.message
+            message: data.message,
+            type: chat.type
         });
         if(chat.dataValues.id){
             cb({status: 200, message: chat})

@@ -15,7 +15,7 @@ exports.loginUser = async (req, res, next) => {
         if(!isEqual) {
             return res.status(401).json({ message: "Invalid password" });
         }
-        res.status(200).json({ message: "User logged in", token: jwt.generateToken(user),  });
+        res.status(200).json({ message: "User logged in", token: jwt.generateToken(user), name: user.name  });
     } catch(err) {
         console.log(err);
         res.status(500).json({ message: "Internal Server Error" });

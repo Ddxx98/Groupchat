@@ -28,6 +28,7 @@ document.getElementById("loginForm").addEventListener("submit", async function (
             });
             console.log(response);
             window.localStorage.setItem("token", response.data.token);
+            window.localStorage.setItem("username", response.data.name);
             document.getElementById("loginForm").reset();
             window.location.href = "./group.html";
         } catch (err) {

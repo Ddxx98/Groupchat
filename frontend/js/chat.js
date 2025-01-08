@@ -13,6 +13,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     const token = window.localStorage.getItem("token");
     const admin = window.localStorage.getItem("Admin");
+    const username = window.localStorage.getItem("username");
     const loadedMessages = new Set();
 
     const socket = io("http://localhost:3000",{
@@ -42,11 +43,13 @@ document.addEventListener("DOMContentLoaded", () => {
                     },
                 });
 
-                socket.emit("message", {
-                    groupId,
-                    type: "file",
-                    fileUrl: response.data.fileUrl,
-                    fileName: file.name,
+                socket.emit("message", { message: response.data.url, groupId, type: "file" }, (response) => {
+                    console.log(response);
+                    if (response.status === 200) {
+                        displayMessage(response.message.sender, response.message.message, response.message.type);
+                        loadedMessages.add(response.message.id);
+                        scrollToLatestMessage();
+                    }
                 });
             } catch (error) {
                 console.error("Failed to upload file:", error);
@@ -182,7 +185,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
             response.data.chats.forEach((chat) => {
                 if (!loadedMessages.has(chat.id)) {
-                    displayMessage(chat.sender, chat.message);
+                    displayMessage(chat.sender, chat.message, chat.type);
                     loadedMessages.add(chat.id);
                     isNewMessageAdded = true;
                 }
@@ -197,7 +200,7 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     };
 
-    const displayMessage = (sender, message) => {
+    const displayMessage = (sender, message, type) => {
         const messageContainer = document.createElement("div");
         messageContainer.classList.add("chat-message");
 
@@ -207,12 +210,32 @@ document.addEventListener("DOMContentLoaded", () => {
 
         const messageElement = document.createElement("div");
         messageElement.classList.add("message-text");
-        messageElement.textContent = message;
+        if (type === "text") {
+            messageElement.textContent = message;
+        } else if (type === "file") {
+            if (message.endsWith(".mp4") || message.endsWith(".mov")) {
+                const video = document.createElement("video");
+                video.controls = true;
+                video.src = message;
+                messageElement.appendChild(video);
+            } else if (message.endsWith(".png") || message.endsWith(".jpg") || message.endsWith(".jpeg")) {
+                const img = document.createElement("img");
+                img.src = message;
+                messageElement.appendChild(img);
+            } else {
+                const fileLink = document.createElement("a");
+                fileLink.href = message;
+                const fileName = message.split("/").pop();
+                fileLink.textContent = fileName;
+                fileLink.target = "_blank";
+                messageElement.appendChild(fileLink);
+            }
+        }
 
         messageContainer.appendChild(senderElement);
         messageContainer.appendChild(messageElement);
 
-        if (sender === "You") {
+        if (sender === username) {
             messageContainer.classList.add("you");
         } else {
             messageContainer.classList.add("other");
@@ -221,17 +244,17 @@ document.addEventListener("DOMContentLoaded", () => {
         chatMessages.appendChild(messageContainer);
     };
 
-    socket.on('message', ({ sender, message }) => {
-        displayMessage(sender, message);
+    socket.on('message', ({ sender, message, type }) => {
+        displayMessage(sender, message, type);
         scrollToLatestMessage();
     });
 
     const sendMessage = async ( message) => {
         try {
-            socket.emit("message", {  message, groupId },(response) => {
+            socket.emit("message", {  message, groupId, type: "text" },(response) => {
                 console.log(response)
                 if(response.status == 200){
-                    displayMessage(response.message.sender, response.message.message);
+                    displayMessage(response.message.sender, response.message.message, response.message.type);
                     loadedMessages.add(response.message.id);
                     scrollToLatestMessage();
                 }

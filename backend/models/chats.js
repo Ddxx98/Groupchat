@@ -20,6 +20,10 @@ const Chats = sequelize.define('chat', {
         type: Sequelize.INTEGER,
         allowNull: false,
     },
+    type: {
+        type: Sequelize.STRING,
+        allowNull: false,
+    }
 });
 
 Chats.belongsTo(Groups, { foreignKey: 'groupId', as: 'group' });
