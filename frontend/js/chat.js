@@ -13,6 +13,18 @@ document.addEventListener("DOMContentLoaded", () => {
     const admin = window.localStorage.getItem("Admin");
     const loadedMessages = new Set();
 
+    const socket = io("http://localhost:3001",{
+        Authorization : `${token}`
+    });
+
+    const sendioMessage = (groupId, message) => {
+        socket.emit("message", {  message, groupId},(response) => {
+            if (response.status == 400 || response.status == 500) {
+                console.log(response.message);
+            }
+        });
+    };
+
     if (admin === "false") {
         showUsersBtn.style.display = "none";
     }
@@ -182,11 +194,13 @@ document.addEventListener("DOMContentLoaded", () => {
 
     const sendMessage = async (sender, message) => {
         try {
-            const response = await axios.post(
-                "http://localhost:3000/chats",
-                { sender: sender, message: message, groupId: groupId },
-                { headers: { Authorization: `${token}` } }
-            );
+            // const response = await axios.post(
+            //     "http://localhost:3000/chats",
+            //     { sender: sender, message: message, groupId: groupId },
+            //     { headers: { Authorization: `${token}` } }
+            // );
+            const response = sendioMessage(groupId, message);
+            console.log(response);
 
             if (response.data && response.data.chat) {
                 displayMessage(response.data.chat.sender, response.data.chat.message);
@@ -194,7 +208,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 scrollToLatestMessage();
             }
         } catch (err) {
-            window.location.href = "./group.html?groupId=${groupId}";
+            //window.location.href = "./group.html?groupId=${groupId}";
             console.error(err);
         }
     };
@@ -215,8 +229,7 @@ document.addEventListener("DOMContentLoaded", () => {
             messageInput.value = "";
         }
     });
-
-    setInterval(loadMessages, 1000);
+    loadMessages();
 });
 // document.addEventListener("DOMContentLoaded", () => {
 //     const chatMessages = document.getElementById("chatMessages");

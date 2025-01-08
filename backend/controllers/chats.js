@@ -61,3 +61,15 @@ exports.getAllUsers = async (req, res, next) => {
         res.status(500).json({ message: "Internal Server Error" })
     }
 }
+
+exports.socketAddChat = async (message, sender, userId, groupId) => {
+    try{
+        const chat = await Chats.create({ message: message, sender: sender, userId: userId, groupId: groupId })
+        if(!chat) {
+            return "User is not a member of the group"
+        }
+        return chat
+    } catch(err) {
+        return err
+    }
+}
