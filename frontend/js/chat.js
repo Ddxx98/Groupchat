@@ -16,7 +16,10 @@ document.addEventListener("DOMContentLoaded", () => {
     const username = window.localStorage.getItem("username");
     const loadedMessages = new Set();
 
-    const socket = io("http://localhost:3000",{
+    const url = "https://backend-one-lyart-27.vercel.app";
+
+    const socket = io(url,{
+        transports: ["polling"],
         auth: {
             token: token,
         },
@@ -36,7 +39,7 @@ document.addEventListener("DOMContentLoaded", () => {
             formData.append("groupId", groupId);
 
             try {
-                const response = await axios.post("http://localhost:3000/chats/upload", formData, {
+                const response = await axios.post(`${url}/chats/upload`, formData, {
                     headers: {
                         Authorization: `${token}`,
                         "Content-Type": "multipart/form-data",
@@ -64,11 +67,10 @@ document.addEventListener("DOMContentLoaded", () => {
         showUsersBtn.addEventListener("click", async () => {
             usersModal.style.display = "flex";
             try {
-                const response = await axios.get(`http://localhost:3000/chats/users`, {
+                const response = await axios.get(`${url}/chats/users`, {
                     headers: { Authorization: `${token}` },
                 });
                 const users = response.data.users;
-                console.log(users);
                 usersList.innerHTML = "";
 
                 users.forEach(user => {
@@ -110,8 +112,8 @@ document.addEventListener("DOMContentLoaded", () => {
     const addGroup = async (userId) => {
         console.log(userId);
         try {
-            const response = await axios.post(
-                `http://localhost:3000/group/add`,
+             await axios.post(
+                `${url}/group/add`,
                 {
                     userId: userId,
                     groupId: groupId
@@ -131,11 +133,10 @@ document.addEventListener("DOMContentLoaded", () => {
     const deleteUser = async (userId) => {
         console.log(userId);
         try {
-            const response = await axios.delete(
-                `http://localhost:3000/group/delete?userId=${userId}&groupId=${groupId}`,
+            await axios.delete(
+                `${url}/group/delete?userId=${userId}&groupId=${groupId}`,
                 { headers: { Authorization:`${token}` } }
             );
-            console.log(response.data);
             window.location.href = `./chat.html?groupId=${groupId}`;
         } catch (err) {
             console.error("Error leaving group:", err);
@@ -156,8 +157,8 @@ document.addEventListener("DOMContentLoaded", () => {
     const promoteUser = async (userId) => {
         console.log(userId);
         try {
-            const response = await axios.post(
-                `http://localhost:3000/group/promote`,
+            await axios.post(
+                `${url}/group/promote`,
                 {
                     userId: userId,
                     groupId: groupId
@@ -176,7 +177,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     const loadMessages = async () => {
         try {
-            const response = await axios.get(`http://localhost:3000/chats/getGroupChat?groupId=${groupId}`, {
+            const response = await axios.get(`${url}/chats/getGroupChat?groupId=${groupId}`, {
                 headers: { Authorization: `${token}` },
             });
             let isNewMessageAdded = false;
@@ -254,10 +255,13 @@ document.addEventListener("DOMContentLoaded", () => {
                     displayMessage(response.message.sender, response.message.message, response.message.type);
                     loadedMessages.add(response.message.id);
                     scrollToLatestMessage();
+                } else{
+                    alert(response.message);
+                    window.location.href = "./group.html";
                 }
             })
         } catch (err) {
-            window.location.href = "./group.html?groupId=${groupId}";
+            window.location.href = "./group.html";
             console.error(err);
         }
     };

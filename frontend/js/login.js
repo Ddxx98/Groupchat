@@ -3,6 +3,7 @@ document.getElementById("loginForm").addEventListener("submit", async function (
 
     document.getElementById("emailError").textContent = "";
     document.getElementById("passwordError").textContent = "";
+    const url = "https://backend-one-lyart-27.vercel.app";
 
     let isValid = true;
 
@@ -22,7 +23,7 @@ document.getElementById("loginForm").addEventListener("submit", async function (
 
     if (isValid) {
         try {
-            const response = await axios.post("http://localhost:3000/login", {
+            const response = await axios.post(`${url}/login`, {
                 email: email,
                 password: password
             });

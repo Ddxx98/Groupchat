@@ -62,7 +62,7 @@ io.on('connection', (socket) => {
             message: data.message,
             type: chat.type
         });
-        if(chat.dataValues.id){
+        if(typeof(chat) == "object"){
             cb({status: 200, message: chat})
         }else{
             cb({status: 400, message: chat})

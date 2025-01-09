@@ -7,10 +7,11 @@ document.addEventListener("DOMContentLoaded", () => {
     const cancelGroupBtn = document.getElementById("cancelGroupBtn");
 
     const token = localStorage.getItem("token");
+    const url = "https://backend-one-lyart-27.vercel.app";
 
     const loadGroups = async () => {
         try {
-            const response = await axios.get("http://localhost:3000/group", {
+            const response = await axios.get(`${url}/group`, {
                 headers: { Authorization: `${token}` }
             });
             const groups = response.data.groups;
@@ -39,11 +40,10 @@ document.addEventListener("DOMContentLoaded", () => {
     const insideGroup = async (groupId) => {
         try{
             const response = await axios.post(
-                `http://localhost:3000/group/insideGroup`,
+                `${url}/group/insideGroup`,
                 {groupId: groupId},
                 { headers: { Authorization: `${token}` } }
             );
-            console.log(response);
             window.localStorage.setItem("Admin", response.data.isAdmin);
             if(response.data.status === 409){
                 return alert("User is not a member of the group.");
@@ -73,7 +73,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
         try {
             await axios.post(
-                "http://localhost:3000/group",
+                `${url}/group`,
                 { groupName: groupName },
                 { headers: { Authorization: `${token}` } }
             );

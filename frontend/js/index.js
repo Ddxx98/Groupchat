@@ -9,6 +9,7 @@ document.getElementById("signupForm").addEventListener("submit", async function 
     const phone = document.getElementById("phone").value.trim();
     const password = document.getElementById("password").value;
     const confirmPassword = document.getElementById("confirmPassword").value;
+    const url = "https://backend-one-lyart-27.vercel.app";
 
     let isValid = true;
 
@@ -41,7 +42,7 @@ document.getElementById("signupForm").addEventListener("submit", async function 
 
     if (isValid) {
         try {
-            const userId = await axios.post("http://localhost:3000/signup", {
+            const userId = await axios.post(`${url}/signup`, {
                 name: name,
                 phone: phone,
                 email: email,

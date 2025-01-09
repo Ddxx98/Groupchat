@@ -94,10 +94,11 @@ exports.getAllUsers = async (req, res, next) => {
 
 exports.socketAddChat = async (message, sender, userId, groupId, type) => {
     try{
-        const chat = await Chats.create({ message: message, sender: sender, userId: userId, groupId: groupId, type: type })
-        if(!chat) {
+        const User = await groupUser.findOne({ where: { groupId: groupId, userId: userId } })
+        if(!User) {
             return "User is not a member of the group"
         }
+        const chat = await Chats.create({ message: message, sender: sender, userId: userId, groupId: groupId, type: type })
         return chat
     } catch(err) {
         return err
