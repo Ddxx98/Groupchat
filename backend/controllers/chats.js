@@ -1,8 +1,37 @@
+const cron = require('node-cron')
+const sequelize = require('../util/database')
+
 const Chats = require('../models/chats')
 const User = require('../models/user')
 const groupUser = require('../models/groupUser')
 const S3services = require('../services/S3services')
 const { Op } = require('sequelize')
+const ArchievedChats = require('../models/archievedChats')
+
+cron.schedule('0 0 * * *', async () => {
+    const transaction = await sequelize.transaction()
+    try{
+        const oldChats = await Chats.findAll()
+        if(oldChats.length > 0) {
+            const archieveChats = oldChats.map(chat => {
+                return {
+                    message: chat.message,
+                    sender: chat.sender,
+                    groupId: chat.groupId,
+                    userId: chat.userId,
+                    type: chat.type
+                }
+            })
+            await ArchievedChats.bulkCreate(archieveChats, { transaction })
+            const chatIds = oldChats.map(chat => chat.id)
+            await Chats.destroy({ where: { id: { [Op.in]: chatIds } }, transaction })
+        }
+        await transaction.commit()
+    } catch(err) {
+        await transaction.rollback()
+        console.log(err)
+    }
+}).start()
 
 exports.addChats = async (req, res, next) => {
     const message = req.body.message

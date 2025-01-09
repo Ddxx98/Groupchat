@@ -44,7 +44,6 @@ document.addEventListener("DOMContentLoaded", () => {
                 });
 
                 socket.emit("message", { message: response.data.url, groupId, type: "file" }, (response) => {
-                    console.log(response);
                     if (response.status === 200) {
                         displayMessage(response.message.sender, response.message.message, response.message.type);
                         loadedMessages.add(response.message.id);
@@ -180,7 +179,6 @@ document.addEventListener("DOMContentLoaded", () => {
             const response = await axios.get(`http://localhost:3000/chats/getGroupChat?groupId=${groupId}`, {
                 headers: { Authorization: `${token}` },
             });
-            console.log(response.data);
             let isNewMessageAdded = false;
 
             response.data.chats.forEach((chat) => {
@@ -252,7 +250,6 @@ document.addEventListener("DOMContentLoaded", () => {
     const sendMessage = async ( message) => {
         try {
             socket.emit("message", {  message, groupId, type: "text" },(response) => {
-                console.log(response)
                 if(response.status == 200){
                     displayMessage(response.message.sender, response.message.message, response.message.type);
                     loadedMessages.add(response.message.id);
